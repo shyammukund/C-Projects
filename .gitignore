@@ -1,1 +1,27 @@
+
+# Ignore macOS generated files
 .DS_Store
+
+# Ignore the .obj directory
+obj/
+
+# Ignore all zip files
+*.zip
+
+# Ignore binaries (common patterns)
+bin/
+*.bin
+*.exe
+*.pdf
+*.aux
+*.log
+*.tar
+*.gz
+*.tex
+
+# Ignore executables without extensions (common names)
+a.out
+main
+
+# Ignore the .vscode directory
+.vscode/
