@@ -7,16 +7,18 @@ using namespace std;
 template <typename T>
 class DequeList
 {
-public:
+/* public:
     // Constructor
-    DequeList(int blockSize);
+    //DequeList(int blockSize);
 
     // Destructor
-    ~DequeList();
+    //~DequeList();
 
     // Copy Constructor
     DequeList(const DequeList<T> &other);
 
+    //Copy Assignment Operator
+    DequeList& operator=(const DequeList& other);
 
     // Append element to the left
     void append_left(T element);
@@ -49,9 +51,10 @@ public:
     bool is_full() const;
 
     // Check if the deque is empty
-    bool is_empty() const;
+    bool is_empty() const; */
 
 private:
+    const int MAP_CAPACITY = 4;
     T** map;         // C-style array of pointers to blocks
     int map_size;    // Current size of the map array
     int block_size;  // Number of elements per block
@@ -70,19 +73,19 @@ private:
 public:
 
     // Constructor
-    template <typename T>
-    DequeList<T>::DequeList(int blockSize) 
-      :  map_size(1), block_size(blockSize), count(0), front_index(-1), back_index(-1)
+   // TO DO: change map_capacity to be min capacity that the deque can hold at creation
+    DequeList(int blockSize = 4) 
+      :  map_size(MAP_CAPACITY), block_size(blockSize), count(0), front_index(-1), back_index(-1)
     {
        map = new T*[map_size];
        for (int i = 0; i < map_size; i++){
-        map[i] = nullptr;
+        map[i] = new T[block_size];
        }
     }
 
     // Destructor
-    template<typename T> 
-    DequeList<T>::~DequeList()
+    
+    ~DequeList()
     {
         for (int i = 0; i < map_size; i++){
             delete[] map[i];
@@ -90,11 +93,11 @@ public:
         delete [] map;
     }
 
-    template <typename T>
-    DequeList<T>:: DequeList(const DequeList& other):
+    // copy constructor
+    DequeList(const DequeList& other):
         map_size(other.map_size), front_index(other.front_index), back_index(other.back_index), count(other.count), block_size(other.block_size)
     {
-        map = new T*[capacity];
+        map = new T*[map_size];
         for (int i = 0; i < map_size; i++){
             if (other.map[i] != nullptr){
                 map[i] = new T[block_size];
@@ -111,8 +114,7 @@ public:
 
     
     // copy assignment operator
-    template <typename T>
-    DequeList<T>::DequeList(const DequeList& other):
+    DequeList& operator=(const DequeList& other)
     {
         if (this == &other){
             return *this;
@@ -142,13 +144,10 @@ public:
                 map[i] = nullptr;
             }
         }
-    
-
         return *this;
     }
 
-    template <typename T>
-    void Deque<T>::print() const
+    void print() const
     {
     // Implementation goes here
     for (T block: map){
@@ -163,9 +162,10 @@ public:
     std::cout << std::endl;
      
     }
-
-    template <typename T> 
-    void DequeList<T>::append_left(T element)
+    /*
+    TO DO: refactor common functionality between append_left & append_right
+    */
+    void append_left(T element)
     {
         if (is_empty()){
             map[0] = new T[block_size];
@@ -211,10 +211,9 @@ public:
         count++;
     }
 
-    template <typename T>
-    void DequeList<T>::append_right(T element){
+    void append_right(T element){
         if (is_empty()){
-            map[1]= new T[block_size];
+            map[0]= new T[block_size];
             back_index = 0;
             front_index = back_index;
             map[back_index][back_index] = element;
@@ -226,7 +225,7 @@ public:
                 if (count/block_size >= map_size){
                     T** new_map = new T*[map_size +1];
                     // copying elements to new map and adding new block
-                    for (int i = 0; i < map_Size; i++){
+                    for (int i = 0; i < map_size; i++){
                         new_map[i] = map[i];
                     }
                     new_map[map_size] = new T[block_size];
@@ -265,8 +264,8 @@ public:
         }
         count++;
     }
-    template <typename T>
-    T DequeList<T>:: pop_left()
+
+    T pop_left()
     {
         if (is_empty()){
             throw out_of_range("Deque is empty");
@@ -275,7 +274,7 @@ public:
         T val = map[0][front_index];
         front_index++;
         count--;
-
+    // TO DO: using delete wastes space.
         if (front_index == block_size){
             delete[] map[0];
             for (int i = 1; i < map_size; i++){
@@ -291,8 +290,8 @@ public:
         return val;
     }
 
-    template <typename T>
-    T DequeList<T>:: pop_right()
+    
+    T pop_right()
     {
          if (is_empty()){
             throw out_of_range("Deque is empty");
@@ -315,17 +314,16 @@ public:
         return val;
     }
 
-    template<typename T>
-    const T& DequeList<T>::peek_left() const
+    
+    const T& peek_left() const
     {
         if (count == 0){
-           throw runtime_error("cannot peek empty deque");
+           throw runtime_error("cannot peek empty deque"); 
         }
         return map[0][front_index];
     }
 
-    template<typename T>
-    const T& DequeList<T>::peek_right() const
+    const T& peek_right() const
     {
         if (count == 0){
            throw runtime_error("cannot peek empty deque");
@@ -334,39 +332,33 @@ public:
         return map[curBlock][back_index];
     }
 
-    template <typename T>
-    int DequeList<T>:: get_count() const
+    int get_count() const
     {
         return count;
     }
     
-    template<typename T>
-    T& DequeList<T>:: at(int index)
+    T& at(int index)
     {
         int block = index/block_size;
         int block_position = index % block_size;
         return map[block][block_position];
     }
 
-    template <typename T>
-    bool DequeList<T>: is_empty() const
+    bool is_empty() const
     {
-        if (count == 0){
-            return true;
-        }
+        return (count == 0);
     }
 
-   template <typename T>
-   bool DequeList<T>:: is_full() const
+   bool is_full() const
    {
-    if (count == map_size * block_size){
-        return true;
-    }
+      return (count == map_size * block_size); 
    }
 
+   int get_capacity() const
+   {
+    return map_size * block_size;
+   }
 
 };
-
-
 
 #endif // DEQUE_LIST_HPP

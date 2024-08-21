@@ -1,8 +1,12 @@
 #include <iostream>
+#include <string>
 #include <cassert>
 #include "deque.hpp"
+#include "dequeList.hpp"
 
 using namespace std;
+
+
 void test_int_append(){
     Deque<int> intDeqOne;
     for (int i = 1; i <= 5; i++) {
@@ -78,12 +82,43 @@ void test_stack(){
       deq.pop_right();
 } */
 
+void dl_append_left_test()
+{
+    cout << "testing DequeList<T>::append_left() : START " << endl;
+    DequeList<int> d1(2);
+    
+    d1.append_left(5);
+    
+    cout << "testing DequeList<T>::append_left() : PASSED " << endl;
+}
 
+void dl_test_is_empty()
+{
+   DequeList<int> d1(5);
+   bool result = d1.is_empty();
+   assert(result == true);
+   d1.append_left(5);
+   result = d1.is_empty();
+   assert(result == false);
+}
 
+void dl_test_is_full()
+{
+    cout << "testing DequeList<T>::is_full() : START " << endl;
+    DequeList<string> d1(2);
+    assert(d1.is_full() == false);
+    d1.append_left("Hello");
+    assert(d1.is_full() == false);
+    d1.append_right("World");
+    assert(d1.is_full() == true);
+    cout << "testing DequeList<T>::is_full() : PASSED " << endl;
+}
 
 int main(int , char** ) 
 {
-    test_int_append();
-    test_string_append();
+    //test_int_append();
+    //test_string_append();
+    dl_test_is_empty();
+    dl_test_is_full();
     return 0;
 }

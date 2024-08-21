@@ -1,6 +1,5 @@
 #include <iostream>
 template <typename T>
-
 class Deque
 {
 public:
@@ -12,8 +11,10 @@ public:
 
     //Copy Constructor
     Deque(const Deque& other);
-        
 
+    //Copy Assignment Operator
+    Deque& operator=(const Deque& other);
+        
     // Method to print
     void print() const;
 
@@ -58,7 +59,7 @@ private:
     
 
 };
-
+// constructor
 template <typename T> 
 Deque<T>::Deque(int initialCapacity,int resizeF) :
     left(-1), count(0), capacity(initialCapacity), resizeFactor(resizeF) 
@@ -85,10 +86,9 @@ Deque<T>::Deque(const Deque& other) :
 }
 
 
-
 // copy assignment operator
 template <typename T>
-Deque<T>::Deque(const Deque& other):
+Deque<T>& Deque<T>::operator=(const Deque& other)
 {
     if (this == &other){
         return *this;
@@ -101,7 +101,7 @@ Deque<T>::Deque(const Deque& other):
     capacity = other.capacity;
     resizeFactor = other.resizeFactor;
 
-    arr* = new T[other.capacity]; 
+    arr = new T[other.capacity]; 
     int i = 0;
     for (int i = 0; i < capacity; i++){
         arr[i] = other.arr[i];
