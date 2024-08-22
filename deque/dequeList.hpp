@@ -79,7 +79,7 @@ public:
     {
        map = new T*[map_size];
        for (int i = 0; i < map_size; i++){
-        map[i] = new T[block_size];
+            map[i] = new T[block_size];
        }
     }
 
@@ -94,8 +94,13 @@ public:
     }
 
     // copy constructor
-    DequeList(const DequeList& other):
-        map_size(other.map_size), front_index(other.front_index), back_index(other.back_index), count(other.count), block_size(other.block_size)
+    DequeList(const DequeList& other)
+        // FIX ME: Sytlistic consistency. The ':' should is its own line
+        //         If you have lot of members you should arrange tham as follow
+        //         That is, you code shouldnt go poast 80 columns
+        : map_size(other.map_size), front_index(other.front_index), 
+          back_index(other.back_index), count(other.count), 
+          block_size(other.block_size)
     {
         map = new T*[map_size];
         for (int i = 0; i < map_size; i++){
@@ -131,7 +136,11 @@ public:
         back_index = other.back_index;
         count = other.count;
         
-
+        //
+        // FIX ME: common code with copy ctor. Refactor this helper function (private)?
+        //         Create a new function, copy_map, (private) that both copy ctor
+        //         copy assignment  can call. Duplication of code is not desirable
+        //
         map = new T*[map_size];
         for (int i = 0; i < map_size; i++){
             if (other.map[i] != nullptr){
@@ -149,6 +158,7 @@ public:
 
     void print() const
     {
+    // FIX ME: Remove "Implementation goes here" before commiting to git
     // Implementation goes here
     for (T block: map){
         if (block != nullptr){
@@ -167,6 +177,11 @@ public:
     */
     void append_left(T element)
     {
+        // FIX ME: is_empty() give the number of elements in teh deque, and
+        //         the capacity. You may confusion size (number of elements) and 
+        //         capacity. deque can be empty but have capacity. This is side-effect
+        //         of updating the contructor to allocate blocks based our discussion
+        //
         if (is_empty()){
             map[0] = new T[block_size];
             front_index = 0; //front index of the block
