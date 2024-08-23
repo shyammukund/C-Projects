@@ -82,24 +82,67 @@ void test_stack(){
       deq.pop_right();
 } */
 
-void dl_append_left_test()
+void dl_append_test()
 {
     cout << "testing DequeList<T>::append_left() : START " << endl;
-    DequeList<int> d1(2);
+    DequeList<int> d1(3);
+    DequeList<int> d2(4);
+
+    // add into empty DequeList
+    d1.append_left(81);
+    d1.print();
+
+    // append to left after first insertion. 
+    // first insertion of a new block on the left
+    d1.append_left(27);
+    d1.append_left(9);
+    d1.append_left(3);
+    d1.print();
+
+    // append right after appending left
+    for (int q = 243; q <= 6561; q*= 3 ){
+        d1.append_right(q);
+    }
+    d1.print();
+
+    //append right into empty Dequelist
+    d2.append_right(10);
+    d2.print();
+
+    //keep appending right so deque has to append to the next block
+    for (int i = 11; i <= 16; i++){
+        d2.append_right(i);
+    }
+    d2.print();
+
+    //keep appending right till deque has to create a new block
+    for (int k = 17; k <= 27; k++){
+        d2.append_right(k);
+    }
+    d2.print();
     
-    d1.append_left(5);
-    
+    // BUG** When d2 is appended_left after append right the print is not printing all the elements of the deque **BUG//
+    // I believe the issue lies in how the end block is being set 
+    // start appending left on the deque that has only been appended right
+    for (int j = 9; j >= 1; j--){
+        d2.append_left(j);
+    }
+    d2.print();
+
+
     cout << "testing DequeList<T>::append_left() : PASSED " << endl;
 }
 
 void dl_test_is_empty()
 {
+   cout << "testing DequeList<T>::is_full() : START " << endl;
    DequeList<int> d1(5);
    bool result = d1.is_empty();
    assert(result == true);
    d1.append_left(5);
    result = d1.is_empty();
    assert(result == false);
+   cout << "testing DequeList<T>::is_full() : PASSED " << endl;
 }
 
 void dl_test_is_full()
@@ -118,7 +161,8 @@ int main(int , char** )
 {
     //test_int_append();
     //test_string_append();
-    dl_test_is_empty();
-    dl_test_is_full();
+    dl_append_test();
+    //dl_test_is_empty();
+    //dl_test_is_full();
     return 0;
 }

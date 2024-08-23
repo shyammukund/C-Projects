@@ -54,11 +54,13 @@ class DequeList
     bool is_empty() const; */
 
 private:
-    const int MAP_CAPACITY = 4;
+    const int MAP_CAPACITY = 4; //Initial Capacity of the Deque
     T** map;         // C-style array of pointers to blocks
     int map_size;    // Current size of the map array
     int block_size;  // Number of elements per block
     int count;       // Number of elements in the deque
+    int start_block; // Index of the starting block of the deque
+    int end_block;  //Index of the end block of the deque
     int front_index; // Index of the front element in the deque
     int back_index;  // Index of the back element in the deque
 
@@ -75,7 +77,7 @@ public:
     // Constructor
    // TO DO: change map_capacity to be min capacity that the deque can hold at creation
     DequeList(int blockSize = 4) 
-      :  map_size(MAP_CAPACITY), block_size(blockSize), count(0), front_index(-1), back_index(-1)
+      :  map_size(MAP_CAPACITY), block_size(blockSize), count(0), start_block(0), end_block(1),  front_index(-1), back_index(-1)
     {
        map = new T*[map_size];
        for (int i = 0; i < map_size; i++){
@@ -112,7 +114,6 @@ public:
     }   
 
 
-    
     // copy assignment operator
     DequeList& operator=(const DequeList& other)
     {
@@ -147,21 +148,43 @@ public:
         return *this;
     }
 
-    void print() const
-    {
-    // Implementation goes here
-    for (T block: map){
-        if (block != nullptr){
-            for (int j = 0; j < block_size; j++){
-                cout << block[j] << " ";
-            }
+   void print()
+{
+    if (is_empty()) {
+        std::cout << "Deque is empty" << std::endl;
+        return;
+    }
+
+    // Print elements from start_block to end_block
+    int block = start_block;
+    int index = front_index;
+  
+
+
+    cout << "Current Deque: ";
+    // Traverse from start_block to end_block
+    while (true) {
+        // Print elements in the current block
+        int limit = (block == end_block) ? back_index + 1 : block_size; // Handle end block differently
+        for (int i = (block == start_block ? front_index : 0); i < limit; i++) {
+            std::cout << map[block][i] << " ";
         }
+        
+        // Move to the next block
+        block = (block + 1) % map_size;
+        
+        // Stop if we have traversed all blocks or reached the end_block
+        if (block == (end_block + 1) % map_size) break;
     }
-    std::cout << std::endl;
-    std::cout << "front index "  << front_index  << " " << "back index " << back_index << " " << "count " << count << " " <<  "map_size " << map_size << "block_size " << block_size << std::endl;
-    std::cout << std::endl;
-     
-    }
+
+    cout << endl;
+    cout << "front_index " << front_index << " back_index " << back_index
+              << " count " << count << " map_size " << map_size
+              << " block_size " << block_size << " start_block " << start_block
+              << " end_block " << end_block << endl;
+    cout << endl;
+}
+  
     /*
     TO DO: refactor common functionality between append_left & append_right
     */
@@ -171,6 +194,7 @@ public:
             map[0] = new T[block_size];
             front_index = 0; //front index of the block
             back_index = front_index; // back index of the block
+            start_block = 0;
             map[0][front_index] = element;
         }
         else{
@@ -198,15 +222,16 @@ public:
                     map[0] = new T[block_size];
                 }
                 // now front is last element of new block
-                front_index = block_size -1;
-                
+                start_block = 0;
+                front_index = block_size-1; 
+                back_index = (back_index + 1) % map_size;   
 
             }
             else{
                 front_index--;
             }
             // adding element to to block
-            map[0][front_index] = element;
+            map[start_block][front_index] = element;
         }
         count++;
     }
@@ -215,13 +240,14 @@ public:
         if (is_empty()){
             map[0]= new T[block_size];
             back_index = 0;
+            end_block = 0;
             front_index = back_index;
             map[back_index][back_index] = element;
         }
         else{
             // check if the block is full 
-            if (back_index == block_size - 1){
-                // check if map has room for a new block
+            if (back_index == block_size -1){
+                // check if map is full on right
                 if (count/block_size >= map_size){
                     T** new_map = new T*[map_size +1];
                     // copying elements to new map and adding new block
@@ -233,34 +259,17 @@ public:
                     map = new_map;
                     map_size++;
                 }
-                else{
-                    // going to the first empty block in map
-                    int current = 0;
-                    for (int i = 0; i < map_size; i++){
-                        if (map[i] == nullptr){
-                            current = i;
-                            break;
-                        }
-                    }
-                    // adding new block
-                    map[current] = new T[block_size];
-                }
-                // now back is first element of new block
+                // now back is first element of new block and end block is the next block on the right
+                end_block = (end_block +1) % map_size;
                 back_index = 0;
+                
 
             }
             else {
                 back_index++;
             }
-            // Find the current block where we need to add the element
-            int curBlock = 0;
-            for (int c = 0; c < map_size; c++){
-                if (map[c] == nullptr){
-                    break;
-                }
-                curBlock = c;
-            }
-            map[curBlock][back_index] = element;
+            // Find the current end block where we need to add the element
+            map[end_block][back_index] = element;
         }
         count++;
     }
@@ -271,16 +280,11 @@ public:
             throw out_of_range("Deque is empty");
         }
 
-        T val = map[0][front_index];
+        T val = map[start_block][front_index];
         front_index++;
         count--;
-    // TO DO: using delete wastes space.
         if (front_index == block_size){
-            delete[] map[0];
-            for (int i = 1; i < map_size; i++){
-                map[i-1] = map[i];
-            }
-            map[map_size-1] = nullptr;
+            start_block = (start_block + 1) % map_size;
             front_index = 0;
         }
         if (count == 0){
@@ -297,15 +301,13 @@ public:
             throw out_of_range("Deque is empty");
         }
 
-        int curBlock = (count-1)/block_size;
-        T val = map[curBlock][back_index];
+        T val = map[end_block][back_index];
         back_index--;
         count--;
 
-        if (back_index < 0 && curBlock > 0){
-            delete[] map[curBlock];
-            map[curBlock] = nullptr;
-            back_index = block_size -1;
+        if (back_index < 0){
+            back_index = block_size -1; 
+            end_block = (end_block -1 + map_size) % map_size;
         }
         if (count == 0){
             front_index = -1;
@@ -320,7 +322,7 @@ public:
         if (count == 0){
            throw runtime_error("cannot peek empty deque"); 
         }
-        return map[0][front_index];
+        return map[start_block][front_index];
     }
 
     const T& peek_right() const
@@ -328,8 +330,7 @@ public:
         if (count == 0){
            throw runtime_error("cannot peek empty deque");
         }
-        int curBlock = (count-1)/block_size;
-        return map[curBlock][back_index];
+        return map[end_block][back_index];
     }
 
     int get_count() const
