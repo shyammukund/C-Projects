@@ -86,7 +86,7 @@ void test_stack(){
       deq.pop_right();
 } */
 
-void dl_pop_left_test() {}
+
 void dl_append_left_test() {
   cout << "testing DequeList<T>::append_left() : START " << endl;
   DequeList<int> d1(4);

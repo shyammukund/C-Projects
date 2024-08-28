@@ -182,7 +182,7 @@ class DequeList {
     }
 
     cout << endl;
-    ;
+
     cout << "front_index " << front_index << " back_index " << back_index
          << " start_block " << start_block << " end_block " << end_block
          << " count " << count << " map_size " << map_size << " block_size "
@@ -190,6 +190,7 @@ class DequeList {
     cout << endl;
     return result;
   }
+
   void append_left(T element) {
     if (is_empty()) {
       front_index = 0;
@@ -197,79 +198,36 @@ class DequeList {
       start_block = map_size / 2;
       end_block = start_block;
     }
-
-    else if (front_index == 0) {
-      start_block--;
-      front_index = block_size - 1;
-    }
-
-    else if (front_index == 0 && start_block == 0) {
+    
+      else if (front_index == 0 && start_block == 0) {
       // map expand left
       T** new_map = new T*[map_size + 1];
+      
       // making room for a new block at front
       for (int i = 0; i < map_size; i++) {
         new_map[i + 1] = map[i];
       }
+      new_map[0] = new T[block_size];
       delete[] map;
       map = new_map;
       map_size++;
+      front_index = block_size - 1;
+      start_block = 0;
+      end_block++;
+    }
+    // appending when there is an existing block 
+    else if (front_index == 0) {
+      start_block--;
       front_index = block_size - 1;
     }
 
     else {
       front_index--;
     }
+  
     map[start_block][front_index] = element;
     count++;
   }
-
-  /* void append_left(T element)
-  {
-      if (is_empty()){
-
-          front_index = 0; //front index of the block
-          back_index = front_index; // back index of the block
-          start_block = 0;
-          end_block = start_block;
-          map[start_block][front_index] = element;
-      }
-      else{
-          // checking if the block is full
-          if (front_index == 0){
-              // expanding map if it doesn't have enough space for another block
-              if (count / block_size >= map_size){
-                  T** new_map = new T*[map_size +1];
-                  // making room for a new block at front
-                  for (int i = 0; i < map_size; i++){
-                      new_map[i+1] = map[i];
-                  }
-                  // adding new block
-                  new_map[0] = new T[block_size];
-                  delete [] map;
-                  map = new_map;
-                  map_size++;
-              }
-              else{
-                  // making room for new  block
-                  for (int i = map_size-1; i >= 0; i--){
-                      map[i+1] = map[i];
-                  }
-                  // adding new block
-                  map[0] = new T[block_size];
-              }
-              // now front is last element of new block
-              start_block = 0;
-              front_index = block_size-1;
-
-          }
-          else{
-              front_index--;
-          }
-          // adding element to to block
-          map[start_block][front_index] = element;
-      }
-      count++;
-  } */
 
   void append_right(T element) {
     if (is_empty()) {
@@ -300,44 +258,6 @@ class DequeList {
     map[end_block][back_index] = element;
     count++;
   }
-
-  /*  void append_right(T element){
-       if (is_empty()){
-           map[0]= new T[block_size];
-           back_index = 0;
-           end_block = 0;
-           front_index = back_index;
-           map[back_index][back_index] = element;
-       }
-       else{
-           // check if the block is full
-           if (back_index == block_size -1){
-               // check if map is full on right
-               if (count/block_size >= map_size){
-                   T** new_map = new T*[map_size +1];
-                   // copying elements to new map and adding new block
-                   for (int i = 0; i < map_size; i++){
-                       new_map[i] = map[i];
-                   }
-                   new_map[map_size] = new T[block_size];
-                   delete [] map;
-                   map = new_map;
-                   map_size++;
-               }
-               // now back is first element of new block and end block is the
-   next block on the right end_block = (end_block +1) % map_size; back_index =
-   0;
-
-
-           }
-           else {
-               back_index++;
-           }
-           // Find the current end block where we need to add the element
-           map[end_block][back_index] = element;
-       }
-       count++;
-   } */
 
   T pop_left() {
     if (is_empty()) {
@@ -405,6 +325,39 @@ class DequeList {
   bool is_full() const { return (count == map_size * block_size); }
 
   int get_capacity() const { return map_size * block_size; }
+
+  // for debugging purposes
+
+  struct DLInternalState {
+    int map_size;     // Current size of the map array
+    int block_size;   // Number of elements per block
+    int count;        // Number of elements in the deque
+    int start_block;  // Index of the starting block of the deque
+    int end_block;    // Index of the end block of the deque
+    int front_index;  // Index of the front element in the deque
+    int back_index;
+
+    bool operator==(const DLInternalState& other) const {
+      return (this->map_size == other.map_size &&
+              this->block_size == other.block_size &&
+              this->count == other.count &&
+              this->start_block == other.start_block &&
+              this->end_block == other.end_block &&
+              this->front_index == other.front_index &&
+              this->back_index == other.back_index);
+    }
+  };
+
+  void get_internal_state(DLInternalState& state) const {
+    state.map_size = map_size;
+    state.block_size = block_size;
+    state.count = count;
+    state.start_block = start_block;
+    state.end_block = end_block;
+    state.front_index = front_index;
+    state.back_index = back_index;
+  }
+
 };
 
 #endif  // DEQUE_LIST_HPP
