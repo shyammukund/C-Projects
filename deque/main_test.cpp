@@ -211,12 +211,13 @@ TEST_CASE("DequeList<T>::append_left_bug()", "[DequeList]") {
   // testing append right on an empty deque; adding 2 elements no block
   // expansion
   DequeList<int> d1(3);
-  vector<int> v1{10, 20, 30, 40, 50, 60, 70, 80, 90};
+  vector<int> v1{90, 80, 70, 60, 50, 40, 30, 20, 10};
   for (auto& e : v1) {
     d1.append_left(e);
   }
   vector<int> resd1 = d1.print();
-  REQUIRE(resd1 == v1);
+  vector<int> exp = {10, 20, 30, 40, 50, 60, 70, 80, 90};
+  REQUIRE(resd1 == exp);
   REQUIRE(d1.get_count() == (int)v1.size());
 
 }
