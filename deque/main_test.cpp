@@ -18,6 +18,23 @@ TEST_CASE("DequeList<T>::is_empty()", "[DequeList]") {
   REQUIRE(d1.is_empty() == false);
 }
 
+TEST_CASE("DequeList::operator=", "[DequeList]") {
+    DequeList<int> d1(4);
+    vector v1{10, 20, 30, 40};
+    for (auto& e : v1) {
+        d1.append_left(e);
+    }
+
+    DequeList<int> d2(4);
+    for (auto& e : v1) {
+        d2.append_left(e);
+    }
+    d2 = d1;
+    auto r1 = d1.print();
+    auto r2 = d2.print();
+    REQUIRE (r1 == r2);
+}
+
 TEST_CASE("DequeList<T>::append_left()", "[DequeList]") {
   // testing append left on an empty deque
   {
@@ -244,6 +261,18 @@ TEST_CASE("DequeList<T>::peek_right()", "[DequeList]") {
     int expected = 10;
     REQUIRE(front == expected);
 
+}
+
+TEST_CASE("DequeList<T>::at()", "[DequeList]"){
+    DequeList<int> d1(3);
+     vector<int> v1{10, 20, 30, 40};
+    for (auto& e : v1) {
+        d1.append_left(e);
+    } 
+    int first = d1.at(0);
+    int third = d1.at(2);
+    REQUIRE( first == 40);
+    REQUIRE(third == 20);
 }
 
 

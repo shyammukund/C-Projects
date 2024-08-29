@@ -268,7 +268,8 @@ class DequeList {
     front_index++;
     count--;
     if (front_index == block_size) {
-      start_block = (start_block + 1) % map_size;
+      start_block++;
+    //   start_block = (start_block + 1) % map_size;
       front_index = 0;
     }
     if (count == 0) {
@@ -289,7 +290,8 @@ class DequeList {
 
     if (back_index < 0) {
       back_index = block_size - 1;
-      end_block = (end_block - 1 + map_size) % map_size;
+      end_block--;
+      //end_block = (end_block - 1 + map_size) % map_size;
     }
     if (count == 0) {
       front_index = -1;
@@ -314,11 +316,33 @@ class DequeList {
 
   int get_count() const { return count; }
 
-  T& at(int index) {
-    int block = index / block_size;
-    int block_position = index % block_size;
+T& at(int index) {
+    if (index < 0 || index >= count) {
+        throw std::out_of_range("Index out of bounds");
+    }
+
+    // Calculate the block number in which the element resides
+    int block = (front_index + index) / block_size;
+    int block_count = getCurrentBlockCount(); 
+    block = (start_block + block) % (block_count);
+
+    // Calculate the position within that block
+    int block_position = (front_index + index) % block_size;
+     
+
+    // Return the reference to the element at the calculated block and position
     return map[block][block_position];
-  }
+}
+
+int getCurrentBlockCount() const {
+// Calculate the number of full blocks
+int full_blocks = count / block_size;
+
+// If there are remaining elements, add one more block
+return full_blocks + (count % block_size > 0 ? 1 : 0);
+}
+
+
 
   bool is_empty() const { return (count == 0); }
 
