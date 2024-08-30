@@ -6,52 +6,6 @@ using namespace std;
 
 template <typename T>
 class DequeList {
-  /* public:
-      // Constructor
-      //DequeList(int blockSize);
-
-      // Destructor
-      //~DequeList();
-
-      // Copy Constructor
-      DequeList(const DequeList<T> &other);
-
-      //Copy Assignment Operator
-      DequeList& operator=(const DequeList& other);
-
-      // Append element to the left
-      void append_left(T element);
-
-      // Append element to the right
-      void append_right(T element);
-
-      // Pop element from the left
-      T pop_left();
-
-      // Pop element from the right
-      T pop_right();
-
-      // Peek at the leftmost element (without removing)
-      const T& peek_left() const;
-
-      // Peek at the rightmost element (without removing)
-      const T& peek_right() const;
-
-      // Get the number of elements in the deque
-      int get_count() const;
-
-      // Print the elements in the deque
-      void print() const;
-
-      // Access element at a specific index
-      T &at(int index);
-
-      // Check if the deque is full
-      bool is_full() const;
-
-      // Check if the deque is empty
-      bool is_empty() const; */
-
  private:
   const int MAP_CAPACITY = 4;  // Initial Capacity of the Deque
   T** map;                     // C-style array of pointers to blocks
@@ -63,18 +17,8 @@ class DequeList {
   int front_index;             // Index of the front element in the deque
   int back_index;              // Index of the back element in the deque
 
-  // TO DO: Add additional helper functions as needed
-
-  // --------------------------------------------------------------------
-  //
-  // Implementation of public functions
-  //
-  // --------------------------------------------------------------------
-
  public:
   // Constructor
-  // TO DO: change map_capacity to be min capacity that the deque can hold at
-  // creation
   DequeList(int blockSize = 4)
       : map_size(MAP_CAPACITY),
         block_size(blockSize),
@@ -130,6 +74,8 @@ class DequeList {
     delete[] map;
 
     map_size = other.map_size;
+    start_block = other.start_block;
+    end_block = other.end_block;
     block_size = other.block_size;
     front_index = other.front_index;
     back_index = other.back_index;
@@ -198,11 +144,11 @@ class DequeList {
       start_block = map_size / 2;
       end_block = start_block;
     }
-    
-      else if (front_index == 0 && start_block == 0) {
+
+    else if (front_index == 0 && start_block == 0) {
       // map expand left
       T** new_map = new T*[map_size + 1];
-      
+
       // making room for a new block at front
       for (int i = 0; i < map_size; i++) {
         new_map[i + 1] = map[i];
@@ -215,7 +161,7 @@ class DequeList {
       start_block = 0;
       end_block++;
     }
-    // appending when there is an existing block 
+    // appending when there is an existing block
     else if (front_index == 0) {
       start_block--;
       front_index = block_size - 1;
@@ -224,7 +170,7 @@ class DequeList {
     else {
       front_index--;
     }
-  
+
     map[start_block][front_index] = element;
     count++;
   }
@@ -269,7 +215,6 @@ class DequeList {
     count--;
     if (front_index == block_size) {
       start_block++;
-    //   start_block = (start_block + 1) % map_size;
       front_index = 0;
     }
     if (count == 0) {
@@ -291,7 +236,6 @@ class DequeList {
     if (back_index < 0) {
       back_index = block_size - 1;
       end_block--;
-      //end_block = (end_block - 1 + map_size) % map_size;
     }
     if (count == 0) {
       front_index = -1;
@@ -316,33 +260,30 @@ class DequeList {
 
   int get_count() const { return count; }
 
-T& at(int index) {
+  T& at(int index) {
     if (index < 0 || index >= count) {
-        throw std::out_of_range("Index out of bounds");
+      throw std::out_of_range("Index out of bounds");
     }
 
     // Calculate the block number in which the element resides
     int block = (front_index + index) / block_size;
-    int block_count = getCurrentBlockCount(); 
+    int block_count = getCurrentBlockCount();
     block = (start_block + block) % (block_count);
 
     // Calculate the position within that block
     int block_position = (front_index + index) % block_size;
-     
 
     // Return the reference to the element at the calculated block and position
     return map[block][block_position];
-}
+  }
 
-int getCurrentBlockCount() const {
-// Calculate the number of full blocks
-int full_blocks = count / block_size;
+  int getCurrentBlockCount() const {
+    // Calculate the number of full blocks
+    int full_blocks = count / block_size;
 
-// If there are remaining elements, add one more block
-return full_blocks + (count % block_size > 0 ? 1 : 0);
-}
-
-
+    // If there are remaining elements, add one more block
+    return full_blocks + (count % block_size > 0 ? 1 : 0);
+  }
 
   bool is_empty() const { return (count == 0); }
 
@@ -381,7 +322,6 @@ return full_blocks + (count % block_size > 0 ? 1 : 0);
     state.front_index = front_index;
     state.back_index = back_index;
   }
-
 };
 
 #endif  // DEQUE_LIST_HPP
