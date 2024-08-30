@@ -2,8 +2,8 @@
 # Ignore macOS generated files
 .DS_Store
 
-# Ignore the .obj directory
-obj/
+# Ignore the .objs directory
+objs/
 
 # Ignore all zip files
 *.zip
